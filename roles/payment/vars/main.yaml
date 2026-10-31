@@ -1,0 +1,3 @@
+CART_HOST: "cart.daws-90s.shop"
+USER_HOST: "user.daws-90s.shop"
+RABBITMQ_HOST: "rabbitmq.daws-90s.shop"

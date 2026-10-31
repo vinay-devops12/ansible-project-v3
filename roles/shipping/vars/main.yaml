@@ -1,0 +1,7 @@
+# dependencies:
+#   - role: common
+
+
+mysql_login_user: "root"
+mysql_root_password: "RoboShop@1"
+MYSQL_HOST: "mysql.daws-90s.shop"
