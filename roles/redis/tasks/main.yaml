@@ -1,5 +1,5 @@
-- name: enable redis 7
-  command: dnf module enable redis:7 -y
+# - name: enable redis 7
+#   command: dnf module enable redis:7 -y
 - name: install redis
   package:
     name: redis
