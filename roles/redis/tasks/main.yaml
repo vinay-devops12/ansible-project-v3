@@ -22,30 +22,32 @@
 
 
 
-- name: install epel-release
+- name: install valkey
   ansible.builtin.dnf:
-    name: epel-release
-    state: present
-
-- name: install redis
-  ansible.builtin.dnf:
-    name: redis
+    name: valkey
     state: present
 
 - name: allow remote connections
-  ansible.builtin.replace:
-    path: /etc/redis/redis.conf
-    regexp: '127.0.0.1'
-    replace: '0.0.0.0'
+  ansible.builtin.lineinfile:
+    path: /etc/valkey/valkey.conf
+    regexp: '^bind '
+    line: 'bind 0.0.0.0'
+  notify: restart valkey
 
 - name: change protected mode
   ansible.builtin.lineinfile:
-    path: /etc/redis/redis.conf
+    path: /etc/valkey/valkey.conf
     regexp: '^protected-mode'
     line: 'protected-mode no'
+  notify: restart valkey
 
-- name: start and enable redis
+- name: start and enable valkey
   ansible.builtin.service:
-    name: redis
+    name: valkey
     state: started
-    enabled: yes
+    enabled: true
+
+- name: restart valkey
+  ansible.builtin.service:
+    name: valkey
+    state: restarted
