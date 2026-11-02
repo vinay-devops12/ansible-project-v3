@@ -6,14 +6,30 @@
 #   debug:
 #     msg: "{{ root_password.mysql_root_password }}"
 - name: install mysql server
-  package:
-    name: mysql-server
+  ansible.builtin.dnf:
+    name: community-mysql-server
     state: present
+
+- name: install python mysql and boto libraries
+  ansible.builtin.pip:
+    name:
+      - PyMySQL
+      - boto3
+      - botocore
+    executable: pip3
+
 - name: start and enable mysql server
-  service:
-    state: started
-    enabled: yes
+  ansible.builtin.service:
     name: mysqld
+    state: started
+    enabled: true
+
+- name: check mysql connection with current root password
+  ansible.builtin.command: mysql -u root -p"{{ mysql_root_password }}" -e "exit"
+  register: mysql_connection
+  ignore_errors: true
+  changed_when: false
+
 - name: setup root password
-  command: mysql_secure_installation --set-root-pass "{{ MYSQL_ROOT_PASSWORD }}"
-  #command: mysql_secure_installation --set-root-pass "{{ root_password.mysql_root_password }}"
+  ansible.builtin.command: mysql_secure_installation --set-root-pass "{{ mysql_root_password }}"
+  when: mysql_connection.failed
