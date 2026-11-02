@@ -1,16 +1,9 @@
-# - name: get the password from AWS secrets manager
-#   debug:
-#     msg: "{{ lookup('amazon.aws.aws_secret', 'roboshop/mysql_root_password', region='us-east-1') | from_json  }}"
-
-# - name: print root password
-#   debug:
-#     msg: "{{ root_password.mysql_root_password }}"
 - name: install mysql server
-  ansible.builtin.dnf:
-    name: mysql8.4-server
+  ansible.builtin.package:
+    name: mysql-server          # RHEL 10 లో దొరక్కపోతే mysql8.4-server
     state: present
 
-- name: install python mysql and boto libraries
+- name: install python libraries
   ansible.builtin.pip:
     name:
       - PyMySQL
@@ -23,3 +16,20 @@
     name: mysqld
     state: started
     enabled: true
+
+- name: wait for mysql port
+  ansible.builtin.wait_for:
+    port: 3306
+    timeout: 60
+
+- name: check if root password is already set
+  ansible.builtin.command: mysql -u root -p"{{ mysql_root_password }}" -e "SELECT 1"
+  register: root_check
+  failed_when: false
+  changed_when: false
+  no_log: true
+
+- name: setup root password
+  ansible.builtin.command: mysql_secure_installation --set-root-pass "{{ mysql_root_password }}"
+  when: root_check.rc != 0
+  no_log: true
