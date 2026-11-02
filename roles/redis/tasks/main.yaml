@@ -22,9 +22,10 @@
 
 
 
-- name: enable redis 7
-  ansible.builtin.command: dnf module enable redis:7 -y
-  changed_when: false
+- name: install epel-release
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present
 
 - name: install redis
   ansible.builtin.dnf:
@@ -34,7 +35,7 @@
 - name: allow remote connections
   ansible.builtin.replace:
     path: /etc/redis/redis.conf
-    regexp: '127\.0\.0\.1'
+    regexp: '127.0.0.1'
     replace: '0.0.0.0'
 
 - name: change protected mode
