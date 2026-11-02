@@ -20,8 +20,6 @@
 #     state: started
 #     enabled: yes
 
-
-
 - name: install valkey
   ansible.builtin.dnf:
     name: valkey
@@ -47,7 +45,3 @@
     state: started
     enabled: true
 
-- name: restart valkey
-  ansible.builtin.service:
-    name: valkey
-    state: restarted
